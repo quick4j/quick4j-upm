@@ -1,0 +1,50 @@
+{
+    "name": "actions",
+    "dataModel": "com.github.quick4j.upm.actions.entity.Action",
+    "columns": [
+        [
+            {
+                "field": "chk",
+                "checkbox": true
+            },
+            {
+                "field":"icon",
+                "title":"图标",
+                "width":50,
+                "formatter":"quick4j.util.string2Image"
+            },
+            {
+                "field":"code",
+                "title":"编码",
+                "width":200
+            },
+            {
+                "field":"name",
+                "title":"名称",
+                "width":200
+            },
+            {
+                "field":"index",
+                "title":"序号",
+                "width":200
+            },
+            {
+                "field": "operation",
+                "title": "操作",
+                "width": 200,
+                "formatter": "doBuildButton"
+            }
+        ]
+    ],
+    "toolbar": [
+        {
+            "iconCls": "icon-add",
+            "text": "New",
+            "handler": "doNew"
+        },
+        {
+            "iconCls": "icon-edit",
+            "text": "Edit"
+        }
+    ]
+}

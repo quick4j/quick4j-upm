@@ -1,0 +1,44 @@
+{
+    "name": "roles",
+    "dataModel": "com.github.quick4j.upm.roles.entity.Role",
+    "columns": [
+        [
+            {
+                "field": "chk",
+                "checkbox": true
+            },
+            {
+                "field":"name",
+                "title":"名称",
+                "width":200
+            },
+            {
+                "field":"desc",
+                "title":"描述",
+                "width":300
+            }
+        ]
+    ],
+    "toolbar": [
+        {
+            "iconCls": "icon-add",
+            "text": "New",
+            "handler": "doNew"
+        },
+        {
+            "iconCls": "icon-edit",
+            "text": "Edit",
+            "handler": "doEdit"
+        },
+        {
+            "iconCls": "icon-remove",
+            "text": "Remove",
+            "handler": "doDelete"
+        },
+        {
+            "iconCls": "icon-search",
+            "text": "Assign Path",
+            "handler": "doAssignResource"
+        }
+    ]
+}
