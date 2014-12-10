@@ -4,7 +4,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.github.quick4j.core.service.Criteria;
 import com.github.quick4j.core.util.JsonUtils;
 import com.github.quick4j.core.web.http.AjaxResponse;
-import com.github.quick4j.upm.roles.entity.PathsInRoles;
+import com.github.quick4j.upm.roles.entity.PathInRole;
 import com.github.quick4j.upm.roles.entity.Role;
 import com.github.quick4j.upm.roles.service.RoleService;
 import org.slf4j.Logger;
@@ -14,7 +14,6 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import java.util.List;
-import java.util.Map;
 
 /**
  * @author zhaojh
@@ -73,7 +72,7 @@ public class RolesController {
     @ResponseBody
     public AjaxResponse doDelete(@PathVariable("id") String id){
         logger.info("delete roles");
-        Criteria<Role, Map> criteria = rolesService.createCriteria(Role.class);
+        Criteria<Role> criteria = rolesService.createCriteria(Role.class);
         criteria.delete(id);
         return new AjaxResponse(true);
     }
@@ -82,7 +81,7 @@ public class RolesController {
         value = "/{id}/paths",
         method = RequestMethod.GET
     )
-    public String doShowAssignResource(String roleId){
+    public String doShowResource(){
         return LOCATION + "paths";
     }
 
@@ -92,14 +91,14 @@ public class RolesController {
         produces = "application/json;charset=utf-8"
     )
     @ResponseBody
-    public AjaxResponse doAssignResource(@PathVariable("id") String roleId,
+    public AjaxResponse doSaveRoleOfResources(@PathVariable("id") String roleId,
                                          @RequestParam("inserted") String inserted,
                                          @RequestParam("deleted") String deleted){
 
-        List<PathsInRoles> insertList =
-                JsonUtils.formJson(inserted, new TypeReference<List<PathsInRoles>>(){});
-        List<PathsInRoles> deleteList =
-                JsonUtils.formJson(deleted, new TypeReference<List<PathsInRoles>>(){});
+        List<PathInRole> insertList =
+                JsonUtils.formJson(inserted, new TypeReference<List<PathInRole>>(){});
+        List<PathInRole> deleteList =
+                JsonUtils.formJson(deleted, new TypeReference<List<PathInRole>>(){});
 
         rolesService.assignResource(roleId, insertList, deleteList);
         return new AjaxResponse(true);

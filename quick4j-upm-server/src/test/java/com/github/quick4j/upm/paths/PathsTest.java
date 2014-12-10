@@ -2,15 +2,16 @@ package com.github.quick4j.upm.paths;
 
 import static org.hamcrest.CoreMatchers.*;
 
-import com.github.quick4j.core.repository.mybatis.MyBatisRepository;
+import com.github.quick4j.core.repository.mybatis.Repository;
 import com.github.quick4j.upm.actions.entity.Action;
-import com.github.quick4j.upm.paths.entity.ActionsInPath;
+import com.github.quick4j.upm.paths.entity.ActionInPath;
 import com.github.quick4j.upm.paths.entity.Path;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 import java.util.Arrays;
@@ -28,16 +29,16 @@ import java.util.Random;
 public class PathsTest {
 
     @Resource
-    private MyBatisRepository myBatisRepository;
+    private Repository repository;
 
     @Test
     public void test(){
-        Action action = myBatisRepository.findOne(Action.class, "2C4E478F84194F1EB2DB69BF00425415");
+        Action action = repository.find(Action.class, "2C4E478F84194F1EB2DB69BF00425415");
         Assert.assertThat(action.getCode(), is("new"));
     }
 
-    @Test
-//    @Transactional(rollbackFor = Exception.class)
+//    @Test
+//    @Transactional
     public void batchInsertPaths(){
         for (int i=1; i<501; i++){
             Path path = new Path();
@@ -46,14 +47,14 @@ public class PathsTest {
             path.setPid("0");
             path.setIndex(i);
 
-            myBatisRepository.insert(path);
+            repository.insert(path);
             for (int j=1; j<4; j++){
                 Path sub = new Path();
                 sub.setPid(path.getId());
                 sub.setName("sub-" + (10) * i + j);
                 sub.setPath(path.getPath() + '/' + sub.getName());
                 sub.setIndex(j);
-                myBatisRepository.insert(sub);
+                repository.insert(sub);
 
                 Random random = new Random();
                 int randomNum = random.nextInt(4) + 1 ;
@@ -65,17 +66,18 @@ public class PathsTest {
                         third.setName("third-" + (10) * ((10) * i + j) + k);
                         third.setPath(sub.getPath() +'/' + third.getName());
                         third.setIndex(k);
-                        myBatisRepository.insert(third);
+                        repository.insert(third);
                     }
                 }
             }
         }
     }
 
-    @Test
+//    @Test
+//    @Transactional
     public void batchBuildActionPathRelation(){
-        List<Path> pathList = myBatisRepository.findAll(Path.class);
-        List<Action> actionList = myBatisRepository.findAll(Action.class);
+        List<Path> pathList = repository.findAll(Path.class);
+        List<Action> actionList = repository.findAll(Action.class);
         String[] actions = new String[]{"new", "edit", "delete", "save"};
         List<String> list = Arrays.asList(actions);
 
@@ -83,8 +85,8 @@ public class PathsTest {
 
             for (Action action : actionList){
                 if(list.contains(action.getCode())){
-                    ActionsInPath actionsInPath = new ActionsInPath(path.getId(), action.getId(), action.getCode(), null);
-                    myBatisRepository.insert(actionsInPath);
+                    ActionInPath actionInPath = new ActionInPath(action, path);
+                    repository.insert(actionInPath);
                 }
             }
 

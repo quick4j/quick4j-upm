@@ -1,6 +1,6 @@
 {
     "name": "paths",
-    "dataModel": "com.github.quick4j.upm.paths.entity.Path",
+    "entity": "com.github.quick4j.upm.paths.entity.Path",
     "columns": [
         [
             {

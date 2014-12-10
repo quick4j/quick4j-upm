@@ -25,7 +25,7 @@ public class ActionsController {
     private final String LOCATION = "actions/";
 
     @Resource
-    private CrudService<Action, Map> simpleCrudService;
+    private CrudService<Action> simpleCrudService;
 
     @RequestMapping(method = RequestMethod.GET)
     public String listing(){
@@ -73,7 +73,7 @@ public class ActionsController {
     @ResponseBody
     public AjaxResponse doDelete(@PathVariable("id") String id){
         logger.info("delete actions");
-        Criteria<Action, Map> criteria = simpleCrudService.createCriteria(Action.class);
+        Criteria<Action> criteria = simpleCrudService.createCriteria(Action.class);
         criteria.delete(id);
         return new AjaxResponse(AjaxResponse.Status.OK);
     }

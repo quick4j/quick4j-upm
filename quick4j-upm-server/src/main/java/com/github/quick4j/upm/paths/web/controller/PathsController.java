@@ -6,7 +6,7 @@ import com.github.quick4j.core.service.CrudService;
 import com.github.quick4j.core.util.JsonUtils;
 import com.github.quick4j.core.web.http.AjaxResponse;
 import com.github.quick4j.upm.actions.entity.Action;
-import com.github.quick4j.upm.paths.entity.ActionsInPath;
+import com.github.quick4j.upm.paths.entity.ActionInPath;
 import com.github.quick4j.upm.paths.entity.Path;
 import com.github.quick4j.upm.paths.service.PathService;
 import org.slf4j.Logger;
@@ -17,7 +17,6 @@ import org.springframework.web.bind.annotation.*;
 import javax.annotation.Resource;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 /**
  * @author zhaojh
@@ -32,7 +31,7 @@ public class PathsController {
     private PathService pathService;
 
     @Resource
-    private CrudService<Action, Map> actionService;
+    private CrudService<Action> actionService;
 
     @RequestMapping(method = RequestMethod.GET)
     public String listing(){
@@ -79,23 +78,23 @@ public class PathsController {
     @ResponseBody
     public AjaxResponse doDelete(@PathVariable("id") String id){
         logger.info("delete actions");
-        Criteria<Path, Map> criteria = pathService.createCriteria(Path.class);
+        Criteria<Path> criteria = pathService.createCriteria(Path.class);
         criteria.delete(id);
         return new AjaxResponse(AjaxResponse.Status.OK);
     }
 
-    @RequestMapping(value = "/{id}/assign/actions", method = RequestMethod.GET)
-    public String doAssignButtons(){
+    @RequestMapping(value = "/{id}/bound/actions", method = RequestMethod.GET)
+    public String doShowActionsInPath(){
         return LOCATION + "actions";
     }
 
     @RequestMapping(
-        value = "/{id}/actions",
+        value = "/{id}/bound/actions",
         method = RequestMethod.POST,
         produces = "application/json;charset=utf-8"
     )
     @ResponseBody
-    public AjaxResponse doSavePathAndButtonRelation(@PathVariable("id") String pathid,
+    public AjaxResponse doBoundOrUnBoundActionForPath(@PathVariable("id") String pathid,
                                                     @RequestParam("inserted") String inserted,
                                                     @RequestParam("deleted") String deleted){
 
@@ -104,7 +103,7 @@ public class PathsController {
 
         List<Action> insertedList = JsonUtils.formJson(inserted, new TypeReference<List<Action>>(){});
         List<Action> deletedList = JsonUtils.formJson(deleted, new TypeReference<List<Action>>(){});
-        pathService.assignButton(pathid, insertedList, deletedList);
+        pathService.saveActionAndPathRelation(pathid, insertedList, deletedList);
         return new AjaxResponse(AjaxResponse.Status.OK);
     }
 
@@ -114,17 +113,8 @@ public class PathsController {
         produces = "application/json"
     )
     @ResponseBody
-    public AjaxResponse doFindAssignedButtons(@PathVariable("id") String pathid){
-        List<ActionsInPath> list = pathService.findAssignedButtons(pathid);
-
-        List<String> ids = new ArrayList<String>();
-        for(ActionsInPath actionInPath : list){
-            ids.add(actionInPath.getActionId());
-        }
-
-        Criteria<Action, Map> criteria = actionService.createCriteria(Action.class);
-        List<Action> actions = criteria.findAll(ids);
-
+    public AjaxResponse doFindActionsInPath(@PathVariable("id") String pathid){
+        List<Action> actions = pathService.findActionsInPath(pathid);
         return new AjaxResponse(AjaxResponse.Status.OK, actions);
     }
 }

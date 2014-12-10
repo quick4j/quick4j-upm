@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.github.quick4j.core.entity.AbstractEntity;
 import com.github.quick4j.core.entity.Entity;
 import com.github.quick4j.plugin.logging.annontation.Auditable;
+import com.github.quick4j.upm.actions.entity.Action;
 
 import javax.persistence.Id;
 import javax.persistence.Column;
@@ -14,24 +15,30 @@ import java.util.List;
  * @author zhaojh
  */
 @javax.persistence.Entity
-@Table(name = "upm_paths")
+@Table(name = "upm_actionInPath")
 @Auditable
-public class Path extends AbstractEntity{
+public class ActionInPath extends AbstractEntity{
     @Id
     @Column(length = 32)
     private String id;
-    @Column(name = "path_name", length = 500, nullable = false)
-    private String name;
-    @Column(name = "path", length = 2000)
-    private String path;
-    @Column(name = "path_icon", length = 100)
-    private String icon;
-    @Column(name = "pid", length = 32)
-    private String pid;
-    @Column(name = "path_index", length = 45)
-    private int index;
+    @Column(name = "path_id", length = 32, nullable = false)
+    private String pathId;
+    @Column(name = "action_id", length = 32, nullable = false)
+    private String actionId;
+    @Column(name = "action_code", length = 100)
+    private String actionCode;
     @Column(name = "application_id", length = 32)
     private String applicationId;
+
+    private Action action;
+    private Path path;
+
+    public ActionInPath() {}
+
+    public ActionInPath(Action action, Path path) {
+        this.action = action;
+        this.path = path;
+    }
 
     @Override
     public void setId(String id) {
@@ -44,7 +51,6 @@ public class Path extends AbstractEntity{
     }
 
     @Override
-    @JsonIgnore
     public List<? extends Entity> getSlave() {
         return null;
     }
@@ -52,48 +58,37 @@ public class Path extends AbstractEntity{
     @Override
     @JsonIgnore
     public String getChineseName() {
-        return "资源";
+        return "资源与按钮关联关系";
     }
 
     @Override
+    @JsonIgnore
     public String getName() {
-        return name;
+        return String.format("%s被绑定到%s", action.getCode(), path.getName());
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public String getPathId() {
+        return pathId;
     }
 
-    public String getPath() {
-        return path;
+    public void setPathId(String pathId) {
+        this.pathId = pathId;
     }
 
-    public void setPath(String path) {
-        this.path = path;
+    public String getActionId() {
+        return actionId;
     }
 
-    public String getIcon() {
-        return icon;
+    public void setActionId(String actionId) {
+        this.actionId = actionId;
     }
 
-    public void setIcon(String icon) {
-        this.icon = icon;
+    public String getActionCode() {
+        return actionCode;
     }
 
-    public String getPid() {
-        return pid;
-    }
-
-    public void setPid(String pid) {
-        this.pid = pid;
-    }
-
-    public int getIndex() {
-        return index;
-    }
-
-    public void setIndex(int index) {
-        this.index = index;
+    public void setActionCode(String actionCode) {
+        this.actionCode = actionCode;
     }
 
     public String getApplicationId() {

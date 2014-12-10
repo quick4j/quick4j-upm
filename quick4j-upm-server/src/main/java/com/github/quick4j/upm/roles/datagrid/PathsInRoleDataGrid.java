@@ -1,11 +1,11 @@
 package com.github.quick4j.upm.roles.datagrid;
 
-import com.github.quick4j.core.repository.mybatis.MyBatisRepository;
+import com.github.quick4j.core.repository.mybatis.Repository;
 import com.github.quick4j.plugin.datagrid.DataGrid;
 import com.github.quick4j.plugin.datagrid.entity.DynamicColumnDataGrid;
 import com.github.quick4j.plugin.datagrid.meta.*;
 import com.github.quick4j.upm.actions.entity.Action;
-import org.springframework.context.annotation.DependsOn;
+import com.github.quick4j.upm.paths.entity.Path;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
@@ -15,26 +15,26 @@ import java.util.List;
 /**
  * @author zhaojh
  */
-@Component
+//@Component
 public class PathsInRoleDataGrid extends DynamicColumnDataGrid{
     @Resource
-    private MyBatisRepository myBatisRepository;
+    private Repository repository;
 
     public PathsInRoleDataGrid() {
-        super("pathsInRole", "com.github.quick4j.upm.paths.entity.Path");
+        super("pathsInRole", Path.class);
         newToolbar()
                 .addToolbutton("Apply", "icon-ok", "doApplyEditingRow")
                 .addToolbutton("Cancel Edit", "icon-cancel", "doCancelEditRow");
     }
 
-    public PathsInRoleDataGrid(String name, String entity, MyBatisRepository myBatisRepository) {
+    public PathsInRoleDataGrid(String name, Class entity, Repository repository) {
         super(name, entity);
-        this.myBatisRepository = myBatisRepository;
+        this.repository = repository;
     }
 
     @Override
     public List<Header> getColumns() {
-        List<Action> list = myBatisRepository.findAll(Action.class);
+        List<Action> list = repository.findAll(Action.class);
         List<Header> columns = new ArrayList<Header>();
         Header header = new Header();
         columns.add(header);
@@ -66,7 +66,7 @@ public class PathsInRoleDataGrid extends DynamicColumnDataGrid{
     @Override
     public DataGrid copySelf() {
         try{
-            PathsInRoleDataGrid dataGrid = new PathsInRoleDataGrid(getName(), getEntity(), myBatisRepository);
+            PathsInRoleDataGrid dataGrid = new PathsInRoleDataGrid(getName(), getEntity(), repository);
 
             if(isExistToolbar()){
                 Toolbar toolbar = dataGrid.newToolbar();

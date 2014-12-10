@@ -1,13 +1,12 @@
 package com.github.quick4j.upm.roles.datagrid;
 
 import com.github.quick4j.core.beans.DynamicBean;
-import com.github.quick4j.core.mybatis.interceptor.model.DataPaging;
-import com.github.quick4j.core.mybatis.interceptor.model.PageRequest;
+import com.github.quick4j.core.mybatis.paging.model.DataPaging;
+import com.github.quick4j.core.mybatis.paging.model.PageRequest;
 import com.github.quick4j.plugin.datagrid.DataGridPostProcessException;
 import com.github.quick4j.plugin.datagrid.support.AbstractDataGridPostProcessor;
-import com.github.quick4j.upm.actions.entity.Action;
-import com.github.quick4j.upm.paths.entity.ActionsInPath;
-import com.github.quick4j.upm.roles.entity.PathsInRoles;
+import com.github.quick4j.upm.paths.entity.ActionInPath;
+import com.github.quick4j.upm.roles.entity.PathInRole;
 import org.springframework.context.annotation.DependsOn;
 import org.springframework.stereotype.Component;
 
@@ -16,8 +15,8 @@ import java.util.*;
 /**
  * @author zhaojh
  */
-@Component
-@DependsOn("pathsInRoleDataGrid")
+//@Component
+//@DependsOn("pathsInRoleDataGrid")
 public class PathsInRoleDataGridPostProcessor extends AbstractDataGridPostProcessor{
 
     @Override
@@ -37,7 +36,7 @@ public class PathsInRoleDataGridPostProcessor extends AbstractDataGridPostProces
             data.add(path);
         }
 
-        Map<String, List<Map<String, String>>> actionsInPathMap = getActionsInPerPath(tmp.keySet().iterator());
+        Map<String, List<Map<String, String>>> actionsInPathMap = getActionsInPerPath(tmp.keySet().toArray(new String[]{}));
         Iterator<String> iterator = actionsInPathMap.keySet().iterator();
         while (iterator.hasNext()){
             String pathid = iterator.next();
@@ -50,18 +49,20 @@ public class PathsInRoleDataGridPostProcessor extends AbstractDataGridPostProces
         }
 
         String roleId = (String) pageRequest.getParameters().get("roleId");
-        List<PathsInRoles> authorizedPathList = getAuthorizedPaths(roleId);
-        for (PathsInRoles pathsInRoles : authorizedPathList){
-            tmp.get(pathsInRoles.getPathId()).put(pathsInRoles.getActionCode(), "check");
+        List<PathInRole> authorizedPathList = getAuthorizedPaths(roleId);
+        for (PathInRole pathInRole : authorizedPathList){
+            tmp.get(pathInRole.getPathId()).put(pathInRole.getActionCode(), "check");
         }
 
-        tmp = null;
+        tmp.clear();
         return new DataPaging(data, dataPaging.getTotal());
 
     }
 
-    private List<PathsInRoles> getAuthorizedPaths(String roleId){
-        return getMyBatisRepository().findAll(PathsInRoles.class, roleId);
+    private List<PathInRole> getAuthorizedPaths(String roleId){
+        PathInRole params = new PathInRole();
+        params.setRoleId(roleId);
+        return getRepository().findByParams(PathInRole.class, params);
     }
 
     /**
@@ -69,27 +70,23 @@ public class PathsInRoleDataGridPostProcessor extends AbstractDataGridPostProces
      * @param pathIds
      * @return key:pathid, value: path上对应的actions
      */
-    private Map<String, List<Map<String, String>>> getActionsInPerPath(Iterator pathIds){
-        List pathidList = new ArrayList();
-        while (pathIds.hasNext()){
-            pathidList.add(pathIds.next());
-        }
+    private Map<String, List<Map<String, String>>> getActionsInPerPath(String[] pathIds){
 
-        List<ActionsInPath> list = getMyBatisRepository().findAll(ActionsInPath.class, pathidList);
+        List<ActionInPath> list = getRepository().findByIds(ActionInPath.class, pathIds);
 
         Map<String, List<Map<String, String>>> map = new HashMap<String, List<Map<String, String>>>();
-        for (ActionsInPath actionsInPath : list){
-            String pathid = actionsInPath.getPathId();
+        for (ActionInPath actionInPath : list){
+            String pathid = actionInPath.getPathId();
             if(map.containsKey(pathid)){
                 Map<String, String> action = new HashMap<String, String>();
-                action.put("id", actionsInPath.getActionId());
-                action.put("code", actionsInPath.getActionCode());
+                action.put("id", actionInPath.getActionId());
+                action.put("code", actionInPath.getActionCode());
                 map.get(pathid).add(action);
             }else{
                 List<Map<String, String>> actionList = new ArrayList<Map<String, String>>();
                 Map<String, String> action = new HashMap<String, String>();
-                action.put("id", actionsInPath.getActionId());
-                action.put("code", actionsInPath.getActionCode());
+                action.put("id", actionInPath.getActionId());
+                action.put("code", actionInPath.getActionCode());
                 actionList.add(action);
                 map.put(pathid, actionList);
             }
