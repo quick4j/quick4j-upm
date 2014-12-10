@@ -1,6 +1,6 @@
 {
     "name": "actions",
-    "dataModel": "com.github.quick4j.upm.actions.entity.Action",
+    "entity": "com.github.quick4j.upm.actions.entity.Action",
     "columns": [
         [
             {

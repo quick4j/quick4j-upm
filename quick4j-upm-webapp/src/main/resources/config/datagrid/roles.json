@@ -1,6 +1,6 @@
 {
     "name": "roles",
-    "dataModel": "com.github.quick4j.upm.roles.entity.Role",
+    "entity": "com.github.quick4j.upm.roles.entity.Role",
     "columns": [
         [
             {

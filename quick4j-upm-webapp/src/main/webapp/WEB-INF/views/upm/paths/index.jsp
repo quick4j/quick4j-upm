@@ -121,7 +121,7 @@
                 });
             }
 
-            function doAssignButtons(){
+            function doBoundActions(){
                 var target = $('#treegrid');
                 var node = target.treegrid('getSelected');
 
@@ -131,7 +131,7 @@
                 }
                 $.showModalDialog({
                     title: '分配按钮',
-                    content: 'url:upm/paths/'+node.id+'/assign/actions',
+                    content: 'url:upm/paths/'+node.id+'/bound/actions',
                     data: {node: node},
                     useiframe: true,
                     showMask: true,

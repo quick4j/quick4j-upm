@@ -77,10 +77,10 @@
                 var inserted = $('#right').datagrid('getChanges', 'inserted');
                 var deleted = $('#right').datagrid('getChanges', 'deleted');
 
-                var path = win.getData('node').id;
+                var id = win.getData('node').id;
                 $.ajax({
                     type: 'post',
-                    url: 'upm/paths/' + path + '/actions',
+                    url: 'upm/paths/' + id + '/bound/actions',
                     data: {inserted: $.toJSON(inserted), deleted: $.toJSON(deleted)},
                     dataType: 'json',
                     success: function(result){
