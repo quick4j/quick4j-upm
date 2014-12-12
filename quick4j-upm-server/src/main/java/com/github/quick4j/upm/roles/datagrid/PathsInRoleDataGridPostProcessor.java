@@ -15,8 +15,8 @@ import java.util.*;
 /**
  * @author zhaojh
  */
-//@Component
-//@DependsOn("pathsInRoleDataGrid")
+@Component
+@DependsOn("pathsInRoleDataGrid")
 public class PathsInRoleDataGridPostProcessor extends AbstractDataGridPostProcessor{
 
     @Override
