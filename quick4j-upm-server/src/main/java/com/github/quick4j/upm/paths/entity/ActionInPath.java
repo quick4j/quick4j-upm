@@ -30,14 +30,15 @@ public class ActionInPath extends AbstractEntity{
     @Column(name = "application_id", length = 32)
     private String applicationId;
 
-    private Action action;
-    private Path path;
+    private String pathName;
 
     public ActionInPath() {}
 
     public ActionInPath(Action action, Path path) {
-        this.action = action;
-        this.path = path;
+        this.actionId = action != null ? action.getId() : null;
+        this.actionCode = action != null ? action.getCode() : null;
+        this.pathId = path != null ? path.getId() : null;
+        this.pathName = path != null ? path.getName() : null;
     }
 
     @Override
@@ -64,7 +65,7 @@ public class ActionInPath extends AbstractEntity{
     @Override
     @JsonIgnore
     public String getName() {
-        return String.format("%s被绑定到%s", action.getCode(), path.getName());
+        return String.format("%s被绑定到%s", actionCode, pathName == null ? pathId : pathName);
     }
 
     public String getPathId() {
