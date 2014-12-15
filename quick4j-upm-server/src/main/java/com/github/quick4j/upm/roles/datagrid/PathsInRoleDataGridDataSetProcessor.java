@@ -3,9 +3,10 @@ package com.github.quick4j.upm.roles.datagrid;
 import com.github.quick4j.core.beans.DynamicBean;
 import com.github.quick4j.core.mybatis.paging.model.DataPaging;
 import com.github.quick4j.core.mybatis.paging.model.PageRequest;
-import com.github.quick4j.plugin.datagrid.DataGridPostProcessException;
-import com.github.quick4j.plugin.datagrid.support.AbstractDataGridPostProcessor;
+import com.github.quick4j.plugin.datagrid.DataSetProcessException;
+import com.github.quick4j.plugin.datagrid.support.AbstractDataSetProcessor;
 import com.github.quick4j.upm.paths.entity.ActionInPath;
+import com.github.quick4j.upm.paths.entity.Path;
 import com.github.quick4j.upm.roles.entity.PathInRole;
 import org.springframework.context.annotation.DependsOn;
 import org.springframework.stereotype.Component;
@@ -17,7 +18,7 @@ import java.util.*;
  */
 @Component
 @DependsOn("pathsInRoleDataGrid")
-public class PathsInRoleDataGridPostProcessor extends AbstractDataGridPostProcessor{
+public class PathsInRoleDataGridDataSetProcessor extends AbstractDataSetProcessor{
 
     @Override
     public String getName() {
@@ -25,22 +26,22 @@ public class PathsInRoleDataGridPostProcessor extends AbstractDataGridPostProces
     }
 
     @Override
-    public DataPaging process(DataPaging dataPaging, PageRequest<Map<String, Object>> pageRequest) throws DataGridPostProcessException {
+    public DataPaging process(DataPaging dataPaging, PageRequest<Map<String, Object>> pageRequest) throws DataSetProcessException {
         List<Map<String, Object>> data = new ArrayList<Map<String, Object>>();
 
         Map<String, Map<String, Object>> tmp = new HashMap<String, Map<String, Object>>();
-        List rows = dataPaging.getRows();
-        for (Object item : rows){
-            Map<String, Object> path = new DynamicBean(item).toMap();
-            tmp.put((String) path.get("id"), path);
-            data.add(path);
+        List<Path> rows = dataPaging.getRows();
+        for (Path path : rows){
+            Map<String, Object> pathMap = new DynamicBean(path).toMap();
+            tmp.put(path.getId(), pathMap);
+            data.add(pathMap);
         }
 
-        Map<String, List<Map<String, String>>> actionsInPathMap = getActionsInPerPath(tmp.keySet().toArray(new String[]{}));
-        Iterator<String> iterator = actionsInPathMap.keySet().iterator();
-        while (iterator.hasNext()){
-            String pathid = iterator.next();
-            List<Map<String, String>> actions = actionsInPathMap.get(pathid);
+        Map<String, List<Map<String, String>>> withActionOfPathOfMap = findActionsForEveryPath(tmp.keySet().toArray(new String[]{}));
+
+        Set<String> editablePathIdSet = withActionOfPathOfMap.keySet();
+        for (String pathid : editablePathIdSet){
+            List<Map<String, String>> actions = withActionOfPathOfMap.get(pathid);
             for (Map action : actions){
                 tmp.get(pathid).put((String) action.get("code"), "cross");
             }
@@ -68,13 +69,14 @@ public class PathsInRoleDataGridPostProcessor extends AbstractDataGridPostProces
     /**
      * 根据pathid 分类actions
      * @param pathIds
-     * @return key:pathid, value: path上对应的actions
+     * @return key:pathid, value: 绑定在这个pathid所代表的path上的action列表
      */
-    private Map<String, List<Map<String, String>>> getActionsInPerPath(String[] pathIds){
+    private Map<String, List<Map<String, String>>> findActionsForEveryPath(String[] pathIds){
 
-        List<ActionInPath> list = getRepository().findByIds(ActionInPath.class, pathIds);
+        List<ActionInPath> list = getRepository().findAll(ActionInPath.class, "selectAllByPathIds", pathIds);
 
         Map<String, List<Map<String, String>>> map = new HashMap<String, List<Map<String, String>>>();
+
         for (ActionInPath actionInPath : list){
             String pathid = actionInPath.getPathId();
             if(map.containsKey(pathid)){
