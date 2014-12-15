@@ -1,0 +1,39 @@
+{
+    "name": "users",
+    "entity": "com.github.quick4j.upm.users.entity.User",
+    "columns": [
+        [
+            {
+                "field": "chk",
+                "checkbox": true
+            },
+            {
+                "field":"name",
+                "title":"账号",
+                "width":200
+            },
+            {
+                "field":"realName",
+                "title":"姓名",
+                "width":200
+            },
+            {
+                "field":"deptName",
+                "title":"部门",
+                "width":300
+            }
+        ]
+    ],
+    "toolbar": [
+        {
+            "iconCls": "icon-add",
+            "text": "New",
+            "handler": "doNew"
+        },
+        {
+            "iconCls": "icon-remove",
+            "text": "Remove",
+            "handler": "doDelete"
+        }
+    ]
+}
